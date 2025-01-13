@@ -3,12 +3,12 @@ package org.poo.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.DeleteAccountOutput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.fileio.InterestRateOutput;
 import org.poo.fileio.OutputGenerator;
-import org.poo.fileio.PayOnlineOutput;
-import org.poo.fileio.ReportErrorOutput;
+import org.poo.fileio.ErrorOutput;
+import org.poo.fileio.SimpleOutput;
 import org.poo.fileio.SpendingsErrorOutput;
 import org.poo.fileio.TransactionsOutput;
 import org.poo.models.FailedDelete;
@@ -16,10 +16,10 @@ import org.poo.models.SuccessfulDelete;
 
 public class OutputHandler {
 
-    private CommandInput commandInput;
-    private BankHandler bank;
-    private ObjectMapper objectMapper;
-    private ArrayNode output;
+    private final CommandInput commandInput;
+    private final BankHandler bank;
+    private final ObjectMapper objectMapper;
+    private final ArrayNode output;
 
     public OutputHandler(final CommandInput commandInput, final BankHandler bank,
                          final ObjectMapper objectMapper, final ArrayNode output) {
@@ -67,9 +67,10 @@ public class OutputHandler {
      *
      * @param exchangeRates cursurile de schimb valutar
      */
-    public void payOnline(final ExchangeInput[] exchangeRates) {
+    public void payOnline(final ExchangeInput[] exchangeRates,
+                          final CommerciantInput[] commerciants) {
 
-        PayOnlineOutput myOutput = bank.payOnline(commandInput, exchangeRates);
+        ErrorOutput myOutput = bank.payOnline(commandInput, exchangeRates, commerciants);
 
         if (myOutput != null) {
             output.add(objectMapper.valueToTree(myOutput));
@@ -120,8 +121,7 @@ public class OutputHandler {
             return;
         }
 
-        InterestRateOutput myOutput = new InterestRateOutput(commandInput.getCommand(),
-                                                            commandInput.getTimestamp());
+        SimpleOutput myOutput = new SimpleOutput(commandInput, "This is not a savings account");
         output.add(objectMapper.valueToTree(myOutput));
     }
 
@@ -136,8 +136,10 @@ public class OutputHandler {
         Report report = bank.generateReport(commandInput);
 
         if (report == null) {
-            ReportErrorOutput myOutput = new ReportErrorOutput(reportDetails.getCommand(),
-                                                                reportDetails.getTimestamp());
+
+            ErrorOutput myOutput = new ErrorOutput(reportDetails,
+                    "Account not found");
+
             output.add(objectMapper.valueToTree(myOutput));
             return;
         }
@@ -159,8 +161,8 @@ public class OutputHandler {
 
         if (report == null) {
 
-            ReportErrorOutput myOutput = new ReportErrorOutput(reportDetails.getCommand(),
-                    reportDetails.getTimestamp());
+            ErrorOutput myOutput = new ErrorOutput(reportDetails,
+                    "Account not found");
 
             output.add(objectMapper.valueToTree(myOutput));
             return;
@@ -172,5 +174,25 @@ public class OutputHandler {
             SpendingsErrorOutput myOutput = new SpendingsErrorOutput(commandInput.getTimestamp());
             output.add(objectMapper.valueToTree(myOutput));
         }
+    }
+
+    /**
+     * Aceasta metoda genereaza mesajul de eroare pentru
+     * o retragere de numerar esuata.
+     *
+     * @param withdrawalDetails datele necesare retragerii
+     * @param exchangeRates cursurile de schimb valutar
+     */
+    public void cashWithdrawal(final CommandInput withdrawalDetails,
+                               final ExchangeInput[] exchangeRates) {
+
+        String message = bank.cashWithdrawal(withdrawalDetails, exchangeRates);
+
+        if (message == null) {
+            return;
+        }
+
+        SimpleOutput myOutput = new SimpleOutput(withdrawalDetails, message);
+        output.add(objectMapper.valueToTree(myOutput));
     }
 }

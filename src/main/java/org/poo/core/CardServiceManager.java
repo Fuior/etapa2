@@ -1,6 +1,7 @@
 package org.poo.core;
 
 import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
 import org.poo.models.AccountService;
 import org.poo.models.CardActionsFormat;
 import org.poo.models.CardDetails;
@@ -14,7 +15,7 @@ public final class CardServiceManager extends BankRepositoryEntity implements Re
     }
 
     @Override
-    public void add(final CommandInput cardDetails) {
+    public void add(final CommandInput cardDetails, final CommerciantInput[] commerciants) {
 
         AccountService account = bankRepository.findAccountByIBAN(cardDetails.getAccount());
         UserDetails user = bankRepository.findUser(cardDetails.getEmail());
@@ -32,12 +33,9 @@ public final class CardServiceManager extends BankRepositoryEntity implements Re
         bankRepository.addCard(account.getCards().getLast());
         bankRepository.addAccountByCard(account, account.getCards().getLast());
 
-        if (account.getAccountType().equals("classic")) {
-
-            user.getTransactions().add(new CardActionsFormat(cardDetails.getTimestamp(),
-                    "New card created", cardNumber,
-                    user.getUserInput().getEmail(), account.getIban()));
-        }
+        user.getTransactions().add(new CardActionsFormat(cardDetails.getTimestamp(),
+                "New card created", cardNumber,
+                user.getUserInput().getEmail(), account.getIban()));
     }
 
     @Override

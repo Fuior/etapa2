@@ -1,9 +1,11 @@
 package org.poo.core;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Data;
 import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.fileio.PayOnlineOutput;
+import org.poo.fileio.ErrorOutput;
 import org.poo.models.UserDetails;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ public final class BankHandler implements IBankHandler {
     private CardServiceManager cardServiceManager;
     private TransactionService transactionService;
     private ReportingService reportingService;
+    private ServicePlanManager servicePlanManager;
 
     public BankHandler(final ArrayList<UserDetails> users, final BankRepository bankRepository) {
 
@@ -26,11 +29,14 @@ public final class BankHandler implements IBankHandler {
         this.cardServiceManager = new CardServiceManager(bankRepository);
         this.transactionService = new TransactionService(bankRepository, cardServiceManager);
         this.reportingService = new ReportingService(bankRepository);
+        this.servicePlanManager = new ServicePlanManager(bankRepository, transactionService);
     }
 
     @Override
-    public void addAccount(final CommandInput accountDetails) {
-        accountServiceManager.add(accountDetails);
+    public void addAccount(final CommandInput accountDetails,
+                           final CommerciantInput[] commerciants) {
+
+        accountServiceManager.add(accountDetails, commerciants);
     }
 
     @Override
@@ -65,8 +71,8 @@ public final class BankHandler implements IBankHandler {
     }
 
     @Override
-    public void addCard(final CommandInput cardDetails) {
-        cardServiceManager.add(cardDetails);
+    public void addCard(final CommandInput cardDetails, final CommerciantInput[] commerciants) {
+        cardServiceManager.add(cardDetails, commerciants);
     }
 
     @Override
@@ -75,28 +81,57 @@ public final class BankHandler implements IBankHandler {
     }
 
     @Override
-    public PayOnlineOutput payOnline(final CommandInput cardDetails,
-                                     final ExchangeInput[] exchangeRates) {
+    public ErrorOutput payOnline(final CommandInput cardDetails,
+                                 final ExchangeInput[] exchangeRates,
+                                 final CommerciantInput[] commerciants) {
 
-        return transactionService.payOnline(cardDetails, exchangeRates);
+        return transactionService.payOnline(cardDetails, exchangeRates, commerciants);
     }
 
     @Override
-    public void sendMoney(final CommandInput transferDetails,
+    public void sendMoney(final CommandInput transferDetails, final ArrayNode output,
                           final ExchangeInput[] exchangeRates) {
 
-        transactionService.sendMoney(transferDetails, exchangeRates);
+        transactionService.sendMoney(transferDetails, exchangeRates, output);
     }
 
     @Override
-    public void splitPayment(final CommandInput paymentDetails,
-                             final ExchangeInput[] exchangeRates) {
+    public void splitPayment(final CommandInput paymentDetails) {
+        transactionService.splitPayment(paymentDetails);
+    }
 
-        transactionService.splitPayment(paymentDetails, exchangeRates);
+    @Override
+    public void splitPaymentResponse(final ArrayNode output, final CommandInput response,
+                                     final ExchangeInput[] exchangeRates) {
+
+        transactionService.splitPaymentResponse(output, response, exchangeRates);
     }
 
     @Override
     public Report generateReport(final CommandInput reportDetails) {
         return reportingService.generateReport(reportDetails);
+    }
+
+    @Override
+    public void withdrawSavings(final CommandInput withdrawalDetails,
+                                final ExchangeInput[] exchangeRates) {
+
+        transactionService.withdrawSavings(withdrawalDetails, exchangeRates);
+    }
+
+    @Override
+    public void upgradePlan(final CommandInput accountDetails,
+                            final ExchangeInput[] exchangeRates,
+                            final ArrayNode output) {
+
+        servicePlanManager.upgradePlan(accountDetails, accountDetails.getNewPlanType(),
+                exchangeRates, output);
+    }
+
+    @Override
+    public String cashWithdrawal(final CommandInput withdrawalDetails,
+                               final ExchangeInput[] exchangeRates) {
+
+        return transactionService.cashWithdrawal(withdrawalDetails, exchangeRates);
     }
 }

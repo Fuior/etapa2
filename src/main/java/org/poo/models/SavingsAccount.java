@@ -5,12 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SavingAccount extends AccountService {
+public class SavingsAccount extends AccountService {
 
     private double interestRate;
 
-    public SavingAccount(final String currency, final String accountType,
-                         final int timestamp) {
+    public SavingsAccount(final String currency, final String accountType,
+                          final int timestamp) {
 
         super(currency, accountType, timestamp);
     }

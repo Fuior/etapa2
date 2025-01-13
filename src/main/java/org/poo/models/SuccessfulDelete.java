@@ -6,7 +6,7 @@ import lombok.Getter;
 public class SuccessfulDelete {
 
     private final String success = "Account deleted";
-    private int timestamp;
+    private final int timestamp;
 
     public SuccessfulDelete(final int timestamp) {
         this.timestamp = timestamp;

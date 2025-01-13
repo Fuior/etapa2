@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public class CardPaymentFormat extends Transaction {
 
-    private double amount;
-    private String commerciant;
+    private final double amount;
+    private final String commerciant;
 
     public CardPaymentFormat(final int timestamp, final String description,
                              final double amount, final String commerciant) {

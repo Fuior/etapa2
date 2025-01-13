@@ -1,6 +1,7 @@
 package org.poo.core;
 
 import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
 
 public interface ResourceManager {
 
@@ -9,7 +10,7 @@ public interface ResourceManager {
      *
      * @param commandInput detaliile resursei ce va fi adaugata
      */
-    void add(CommandInput commandInput);
+    void add(CommandInput commandInput, CommerciantInput[] commerciants);
 
     /**
      * Aceasta metoda sterge o resursa a unui user

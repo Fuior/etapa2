@@ -14,6 +14,8 @@ public class UserDetails {
     private ArrayList<AccountService> bankAccounts;
     private Alias alias;
     private ArrayList<Transaction> transactions;
+    private String servicePlan;
+    private int highValuePaymentCount;
 
     public record Alias(String name, AccountService account) { }
 
@@ -22,5 +24,7 @@ public class UserDetails {
         this.userInput = userInput;
         this.bankAccounts = new ArrayList<>();
         this.transactions = new ArrayList<>();
+        this.servicePlan = userInput.getOccupation().equals("student") ? "student" : "standard";
+        this.highValuePaymentCount = 0;
     }
 }

@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public class Transaction {
 
-    private int timestamp;
-    private String description;
+    private final int timestamp;
+    private final String description;
 
     public Transaction(final int timestamp, final String description) {
         this.timestamp = timestamp;

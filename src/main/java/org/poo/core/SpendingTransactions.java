@@ -27,7 +27,7 @@ class Commerciant {
 public final class SpendingTransactions extends TransactionFormat {
 
     @JsonProperty("commerciants")
-    private ArrayList<Commerciant> commerciants;
+    private final ArrayList<Commerciant> commerciants;
 
     public SpendingTransactions(final AccountService account) {
         super(account);

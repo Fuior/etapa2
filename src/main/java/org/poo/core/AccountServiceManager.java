@@ -2,9 +2,11 @@ package org.poo.core;
 
 import lombok.Getter;
 import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
 import org.poo.models.AccountService;
 import org.poo.models.ClassicAccount;
-import org.poo.models.SavingAccount;
+import org.poo.models.InterestFormat;
+import org.poo.models.SavingsAccount;
 import org.poo.models.Transaction;
 import org.poo.models.UserDetails;
 
@@ -20,20 +22,22 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
     }
 
     @Override
-    public void add(final CommandInput accountDetails) {
+    public void add(final CommandInput accountDetails, final CommerciantInput[] commerciants) {
 
         UserDetails user = bankRepository.findUser(accountDetails.getEmail());
         AccountService bankAccount;
 
         if (accountDetails.getAccountType().equals("savings")) {
-            bankAccount = new SavingAccount(accountDetails.getCurrency(),
+            bankAccount = new SavingsAccount(accountDetails.getCurrency(),
                     accountDetails.getAccountType(), accountDetails.getTimestamp());
 
-            ((SavingAccount) bankAccount).setInterestRate(accountDetails.getInterestRate());
+            ((SavingsAccount) bankAccount).setInterestRate(accountDetails.getInterestRate());
         } else {
             bankAccount = new ClassicAccount(accountDetails.getCurrency(),
                     accountDetails.getAccountType(), accountDetails.getTimestamp());
         }
+
+        bankAccount.setCommerciantTransactions(commerciants);
 
         user.getBankAccounts().add(bankAccount);
         user.getTransactions().add(new Transaction(accountDetails.getTimestamp(),
@@ -47,7 +51,6 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
     public void delete(final CommandInput accountDetails) {
 
         AccountService bankAccount = bankRepository.findAccountByIBAN(accountDetails.getAccount());
-
         String message = "Account couldn't be deleted - see org.poo.transactions for details";
 
         if (bankAccount == null) {
@@ -57,7 +60,7 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
 
         UserDetails user = bankRepository.findUserByAccount(bankAccount);
 
-        if (bankAccount.getBalance() != 0) {
+        if (bankAccount.getBalance() != 0.0) {
 
             user.getTransactions().add(new Transaction(accountDetails.getTimestamp(),
                     "Account couldn't be deleted - there are funds remaining"));
@@ -74,7 +77,12 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
         }
 
         bankAccount.getCards().clear();
+        bankAccount.getFoodTransactions().clear();
+        bankAccount.getClothesTransactions().clear();
+        bankAccount.getTechTransactions().clear();
+
         user.getBankAccounts().removeIf(a -> a.getIban().equals(bankAccount.getIban()));
+        error = null;
     }
 
     /**
@@ -139,8 +147,12 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
             return -1;
         }
 
-        double interest = accout.getBalance() * ((SavingAccount) accout).getInterestRate();
+        double interest = accout.getBalance() * ((SavingsAccount) accout).getInterestRate();
         accout.setBalance(accout.getBalance() + interest);
+
+        UserDetails user = bankRepository.findUserByAccount(accout);
+        user.getTransactions().add(new InterestFormat(interestDetails.getTimestamp(),
+                "Interest rate income", interest, accout.getCurrency()));
 
         return 0;
     }
@@ -163,9 +175,9 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
             return -1;
         }
 
-        ((SavingAccount) accout).setInterestRate(interestDetails.getInterestRate());
+        ((SavingsAccount) accout).setInterestRate(interestDetails.getInterestRate());
         String description = "Interest rate of the account changed to "
-                            + ((SavingAccount) accout).getInterestRate();
+                            + ((SavingsAccount) accout).getInterestRate();
 
         UserDetails user = bankRepository.findUserByAccount(accout);
         user.getTransactions().add(new Transaction(interestDetails.getTimestamp(), description));

@@ -5,9 +5,9 @@ import lombok.Getter;
 @Getter
 public class CardActionsFormat extends Transaction {
 
-    private String card;
-    private String cardHolder;
-    private String account;
+    private final String card;
+    private final String cardHolder;
+    private final String account;
 
     public CardActionsFormat(final int timestamp, final String description,
                              final String card, final String cardHolder, final String account) {

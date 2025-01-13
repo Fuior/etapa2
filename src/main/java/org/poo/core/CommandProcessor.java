@@ -52,16 +52,16 @@ public final class CommandProcessor {
         Utils.resetRandom();
 
         for (CommandInput commandInput : inputData.getCommands()) {
-
             OutputHandler outputHandler;
             outputHandler = new OutputHandler(commandInput, bank, objectMapper, output);
 
             switch (commandInput.getCommand()) {
                 case "printUsers" -> outputHandler.printUsers();
 
-                case "addAccount" -> bank.addAccount(commandInput);
+                case "addAccount" -> bank.addAccount(commandInput, inputData.getCommerciants());
 
-                case "createCard", "createOneTimeCard" -> bank.addCard(commandInput);
+                case "createCard", "createOneTimeCard" -> bank.addCard(commandInput,
+                        inputData.getCommerciants());
 
                 case "addFunds" -> bank.addFunds(commandInput);
 
@@ -69,9 +69,11 @@ public final class CommandProcessor {
 
                 case "deleteCard" -> bank.deleteCard(commandInput);
 
-                case "payOnline" -> outputHandler.payOnline(inputData.getExchangeRates());
+                case "payOnline" -> outputHandler.payOnline(inputData.getExchangeRates(),
+                        inputData.getCommerciants());
 
-                case "sendMoney" -> bank.sendMoney(commandInput, inputData.getExchangeRates());
+                case "sendMoney" -> bank.sendMoney(commandInput, output,
+                        inputData.getExchangeRates());
 
                 case "setAlias" -> bank.setAlias(commandInput);
 
@@ -81,8 +83,11 @@ public final class CommandProcessor {
 
                 case "setMinBalance" -> bank.setMinBalance(commandInput);
 
-                case "splitPayment" -> bank.splitPayment(commandInput,
-                                        inputData.getExchangeRates());
+                case "splitPayment" -> bank.splitPayment(commandInput);
+
+                case "acceptSplitPayment", "rejectSplitPayment" ->
+                        bank.splitPaymentResponse(output, commandInput,
+                        inputData.getExchangeRates());
 
                 case "addInterest", "changeInterestRate" -> outputHandler.interestRate();
 
@@ -90,7 +95,14 @@ public final class CommandProcessor {
 
                 case "spendingsReport" -> outputHandler.getSpendingReport(commandInput);
 
-                default -> System.out.println("Invalid command.");
+                case "withdrawSavings" ->
+                        bank.withdrawSavings(commandInput, inputData.getExchangeRates());
+
+                case "upgradePlan" ->
+                        bank.upgradePlan(commandInput, inputData.getExchangeRates(), output);
+
+                case "cashWithdrawal" ->
+                        outputHandler.cashWithdrawal(commandInput, inputData.getExchangeRates());
             }
         }
     }

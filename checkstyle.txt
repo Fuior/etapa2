@@ -1,6 +1,4 @@
 Starting audit...
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/checker/Checker.java:1: File does not end with a newline. [NewlineAtEndOfFile]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/checker/CheckerConstants.java:1: File does not end with a newline. [NewlineAtEndOfFile]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/fileio/CommerciantInput.java:6:8: Unused import - java.util.List. [UnusedImports]
+[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/CommandProcessor.java:58:13: switch without "default" clause. [MissingSwitchDefault]
 Audit done.
-Checkstyle ends with 3 errors.
+Checkstyle ends with 1 errors.

@@ -2,24 +2,16 @@ package org.poo.models;
 
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public class SplitPaymentError extends Transaction {
 
-    private String currency;
-    private double amount;
-    private List<String> involvedAccounts;
-    private String error;
+    private final String splitPaymentType;
+    private final String currency;
 
+    public SplitPaymentError(final String description, final SplitPaymentFormat paymentInput) {
 
-    public SplitPaymentError(final int timestamp, final String description,
-                             final SplitPaymentFormat paymentInput, final String iban) {
-
-        super(timestamp, description);
+        super(paymentInput.getTimestamp(), description);
+        this.splitPaymentType = paymentInput.getSplitPaymentType();
         this.currency = paymentInput.getCurrency();
-        this.amount = paymentInput.getAmount();
-        this.involvedAccounts = paymentInput.getInvolvedAccounts();
-        this.error = "Account " + iban + " has insufficient funds for a split payment.";
     }
 }

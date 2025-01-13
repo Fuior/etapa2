@@ -1,8 +1,10 @@
 package org.poo.core;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.fileio.PayOnlineOutput;
+import org.poo.fileio.ErrorOutput;
 
 public interface IBankHandler {
 
@@ -11,7 +13,7 @@ public interface IBankHandler {
      *
      * @param accountDetails datele actiunii
      */
-    void addAccount(CommandInput accountDetails);
+    void addAccount(CommandInput accountDetails, CommerciantInput[] commerciants);
 
     /**
      * Aceasta metoda sterge un cont
@@ -63,7 +65,7 @@ public interface IBankHandler {
      *
      * @param cardDetails detaliile necesare pentru crearea cardului
      */
-    void addCard(CommandInput cardDetails);
+    void addCard(CommandInput cardDetails, CommerciantInput[] commerciants);
 
     /**
      * Aceasta metoda sterge un card
@@ -77,9 +79,10 @@ public interface IBankHandler {
      *
      * @param cardDetails detaliile platii
      * @param exchangeRates cursurile de schimb valutar
-     * @return
+     * @return mesajul de eroare sau null daca plata s-a efectuat cu succes
      */
-    PayOnlineOutput payOnline(CommandInput cardDetails, ExchangeInput[] exchangeRates);
+    ErrorOutput payOnline(CommandInput cardDetails, ExchangeInput[] exchangeRates,
+                          CommerciantInput[] commerciants);
 
     /**
      * Aceasta metoda face un transfer bancar
@@ -87,15 +90,23 @@ public interface IBankHandler {
      * @param transferDetails detaliile pentru transferul bancar
      * @param exchangeRates cursurile de schimb valutar
      */
-    void sendMoney(CommandInput transferDetails, ExchangeInput[] exchangeRates);
+    void sendMoney(CommandInput transferDetails, ArrayNode output, ExchangeInput[] exchangeRates);
 
     /**
      * Aceasta metoda face o plata distribuita
      *
      * @param paymentDetails detaliile platii
+     */
+    void splitPayment(CommandInput paymentDetails);
+
+    /**
+     * Aceasta metoda accepta sau refuza o plata distribuita
+     *
+     * @param response raspunsul user-ului
      * @param exchangeRates cursurile de schimb valutar
      */
-    void splitPayment(CommandInput paymentDetails, ExchangeInput[] exchangeRates);
+    void splitPaymentResponse(ArrayNode output, CommandInput response,
+                              ExchangeInput[] exchangeRates);
 
     /**
      * Aceasta metoda genereaza un report de cheltuieli
@@ -104,4 +115,29 @@ public interface IBankHandler {
      * @return reportul creat
      */
     Report generateReport(CommandInput reportDetails);
+
+    /**
+     * Aceasta metoda transfera bani dintr-un cont de economii
+     * intr-un cont classic.
+     *
+     * @param withdrawalDetails datele necesare tranzactieie
+     * @param exchangeRates cursurile de schimb valutar
+     */
+    void withdrawSavings(CommandInput withdrawalDetails, ExchangeInput[] exchangeRates);
+
+    /**
+     * Aceasta metoda face upgrade la planul unui user
+     *
+     * @param accountDetails datele contului pentru care se face upgrade la plan
+     * @param exchangeRates cursurile de schimb valutar
+     */
+    void upgradePlan(CommandInput accountDetails, ExchangeInput[] exchangeRates, ArrayNode output);
+
+    /**
+     * Aceasta metoda retrage bani cash dintr-un cont
+     *
+     * @param withdrawalDetails datele necesare tranzactieie
+     * @param exchangeRates cursurile de schimb valutar
+     */
+    String cashWithdrawal(CommandInput withdrawalDetails, ExchangeInput[] exchangeRates);
 }

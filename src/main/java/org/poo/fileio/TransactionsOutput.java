@@ -12,7 +12,7 @@ public class TransactionsOutput {
 
     private final String command = "printTransactions";
     private ArrayList<Transaction> output;
-    private int timestamp;
+    private final int timestamp;
 
     public TransactionsOutput(final int timestamp) {
         this.timestamp = timestamp;

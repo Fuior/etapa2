@@ -1,1 +1,15 @@
-[ ]
+[ {
+  "command" : "cashWithdrawal",
+  "output" : {
+    "timestamp" : 79,
+    "description" : "User not found"
+  },
+  "timestamp" : 79
+}, {
+  "command" : "cashWithdrawal",
+  "output" : {
+    "timestamp" : 80,
+    "description" : "User not found"
+  },
+  "timestamp" : 80
+} ]

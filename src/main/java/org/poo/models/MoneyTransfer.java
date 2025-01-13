@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public class MoneyTransfer extends Transaction {
 
-    private String senderIBAN;
-    private String receiverIBAN;
-    private String amount;
-    private String transferType;
+    private final String senderIBAN;
+    private final String receiverIBAN;
+    private final String amount;
+    private final String transferType;
 
     public MoneyTransfer(final int timestamp, final String description,
                          final String senderIBAN, final String receiverIBAN,
