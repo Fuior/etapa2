@@ -1,0 +1,109 @@
+package org.poo.core.service.card;
+
+import org.poo.core.BankRepository;
+import org.poo.core.BankRepositoryEntity;
+import org.poo.core.service.ResourceManager;
+import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
+import org.poo.models.account.AccountService;
+import org.poo.models.account.BusinessAccount;
+import org.poo.models.card.CardActionsFormat;
+import org.poo.models.card.CardDetails;
+import org.poo.models.user.UserDetails;
+import org.poo.utils.Utils;
+
+public final class CardServiceManager extends BankRepositoryEntity implements ResourceManager {
+
+    public CardServiceManager(final BankRepository bankRepository) {
+        super(bankRepository);
+    }
+
+    @Override
+    public void add(final CommandInput cardDetails, final CommerciantInput[] commerciants) {
+
+        AccountService account = bankRepository.findAccountByIBAN(cardDetails.getAccount());
+        UserDetails user = bankRepository.findUser(cardDetails.getEmail());
+
+        if (account == null || user == null) {
+            return;
+        }
+
+        String cardNumber = Utils.generateCardNumber();
+        String type = cardDetails.getCommand()
+                .equals("createCard") ? "basic card" : "one time card";
+
+        account.getCards().add(new CardDetails(cardNumber, type, cardDetails.getTimestamp()));
+        account.getCards().getLast().setCardHolder(user);
+
+        bankRepository.addCard(account.getCards().getLast());
+        bankRepository.addAccountByCard(account, account.getCards().getLast());
+
+        user.getTransactions().add(new CardActionsFormat(cardDetails.getTimestamp(),
+                "New card created", cardNumber,
+                user.getUserInput().getEmail(), account.getIban()));
+    }
+
+    @Override
+    public void delete(final CommandInput cardDetails) {
+
+        CardDetails card = bankRepository.findCardByNumber(cardDetails.getCardNumber());
+
+        if (card == null) {
+            return;
+        }
+
+        AccountService account = bankRepository.findAccountByCard(cardDetails.getCardNumber());
+        UserDetails user = bankRepository.findUserByAccount(account);
+
+        if (account.getAccountType().equals("business")) {
+
+            if (((BusinessAccount) account).isEmployee(user)
+                    && card.getCardHolder() != user) {
+
+                return;
+            }
+        }
+
+        if (account.getBalance() != 0) {
+            return;
+        }
+
+        user.getTransactions().add(new CardActionsFormat(cardDetails.getTimestamp(),
+                "The card has been destroyed", card.getCardNumber(),
+                user.getUserInput().getEmail(), account.getIban()));
+
+        bankRepository.deleteCard(card.getCardNumber());
+        bankRepository.deleteAccountByCard(card);
+
+        account.getCards().removeIf(c -> c.getCardNumber().equals(card.getCardNumber()));
+    }
+
+    /**
+     * Aceasta metoda sterge un card "one time card"
+     * si genereaza unul nou in locul acestuia
+     *
+     * @param user user-ul care detine cardul
+     * @param account contul cu care este asociat cardul
+     * @param card datele cardului
+     * @param timestamp momentul de timp la care are loc actiunea
+     */
+    public void replaceCard(final UserDetails user, final AccountService account,
+                             final CardDetails card, final int timestamp) {
+
+        user.getTransactions().add(new CardActionsFormat(timestamp,
+                "The card has been destroyed", card.getCardNumber(),
+                user.getUserInput().getEmail(), account.getIban()));
+
+        bankRepository.deleteCard(card.getCardNumber());
+        bankRepository.deleteAccountByCard(card);
+
+        card.setCardNumber(Utils.generateCardNumber());
+
+        bankRepository.addCard(card);
+        bankRepository.addAccountByCard(account, card);
+
+        user.getTransactions().add(new CardActionsFormat(timestamp,
+                "New card created", card.getCardNumber(),
+                user.getUserInput().getEmail(), account.getIban()));
+    }
+}

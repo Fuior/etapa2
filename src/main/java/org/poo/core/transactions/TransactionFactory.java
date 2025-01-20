@@ -1,7 +1,7 @@
 package org.poo.core.transactions;
 
 import org.poo.core.BankRepository;
-import org.poo.core.CardServiceManager;
+import org.poo.core.service.ServiceHandler;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 
@@ -17,7 +17,7 @@ public final class TransactionFactory {
      *
      * @param operationType tipul operatiei
      * @param bankRepository o instanta a clasei BankRepository
-     * @param cardServiceManager o instanta a clasei CardServiceManager
+     * @param serviceHandler o instanta a clasei ServiceHandler
      * @param commerciants lista de comercianti
      * @param splitPayments datele comenzilor pentru platile distribuite
      * @param splitPaymentsResponse raspunsurile user-ilor implicati intr-o plata distribuita
@@ -25,13 +25,13 @@ public final class TransactionFactory {
      */
     public static TransactionOperation getOperation(
             final String operationType, final BankRepository bankRepository,
-            final CardServiceManager cardServiceManager, final CommerciantInput[] commerciants,
+            final ServiceHandler serviceHandler, final CommerciantInput[] commerciants,
             final List<CommandInput> splitPayments,
             final List<CommandInput> splitPaymentsResponse) {
 
         return switch (operationType) {
             case "payOnline" ->
-                    new PayOnlineOperation(bankRepository, cardServiceManager, commerciants);
+                    new PayOnlineOperation(bankRepository, serviceHandler, commerciants);
 
             case "sendMoney" -> new SendMoneyOperation(bankRepository, commerciants);
 

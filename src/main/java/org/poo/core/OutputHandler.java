@@ -2,6 +2,7 @@ package org.poo.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.poo.core.service.report.Report;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.DeleteAccountOutput;
 import org.poo.fileio.ErrorOutput;
@@ -9,8 +10,9 @@ import org.poo.fileio.OutputGenerator;
 import org.poo.fileio.SimpleOutput;
 import org.poo.fileio.SpendingsErrorOutput;
 import org.poo.fileio.TransactionsOutput;
-import org.poo.models.FailedDelete;
-import org.poo.models.SuccessfulDelete;
+import org.poo.models.card.CardStatus;
+import org.poo.models.errors.FailedDelete;
+import org.poo.models.errors.SuccessfulDelete;
 
 public class OutputHandler {
 

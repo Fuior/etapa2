@@ -1,6 +1,7 @@
 package org.poo.core;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.poo.core.service.report.Report;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
@@ -11,6 +12,7 @@ public interface IBankHandler {
      * Aceasta metoda adauga un cont
      *
      * @param accountDetails datele actiunii
+     * @param commerciants comerciantii
      */
     void addAccount(CommandInput accountDetails, CommerciantInput[] commerciants);
 

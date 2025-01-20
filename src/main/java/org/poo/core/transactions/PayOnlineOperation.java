@@ -1,31 +1,31 @@
 package org.poo.core.transactions;
 
 import org.poo.core.BankRepository;
-import org.poo.core.CardServiceManager;
+import org.poo.core.service.ServiceHandler;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.models.AccountService;
-import org.poo.models.BusinessAccount;
-import org.poo.models.BusinessAssociate;
-import org.poo.models.CardDetails;
-import org.poo.models.CardPaymentFormat;
-import org.poo.models.ClassicAccount;
-import org.poo.models.Transaction;
-import org.poo.models.UserDetails;
+import org.poo.models.account.AccountService;
+import org.poo.models.account.BusinessAccount;
+import org.poo.models.account.BusinessAssociate;
+import org.poo.models.account.ClassicAccount;
+import org.poo.models.card.CardDetails;
+import org.poo.models.transactions.CardPaymentFormat;
+import org.poo.models.transactions.Transaction;
+import org.poo.models.user.UserDetails;
 
 public final class PayOnlineOperation extends MoneyPayments implements TransactionOperation {
 
     private final BankRepository bankRepository;
-    private final CardServiceManager cardServiceManager;
+    private final ServiceHandler serviceHandler;
     private final CommerciantInput[] commerciants;
 
     public PayOnlineOperation(final BankRepository bankRepository,
-                              final CardServiceManager cardServiceManager,
+                              final ServiceHandler serviceHandler,
                               final CommerciantInput[] commerciants) {
 
         this.bankRepository = bankRepository;
-        this.cardServiceManager = cardServiceManager;
+        this.serviceHandler = serviceHandler;
         this.commerciants = commerciants;
     }
 
@@ -56,7 +56,7 @@ public final class PayOnlineOperation extends MoneyPayments implements Transacti
         }
 
         if (card.getType().equals("one time card")) {
-            cardServiceManager.replaceCard(user, account, card, cardDetails.getTimestamp());
+            serviceHandler.replaceCard(user, account, card, cardDetails.getTimestamp());
         }
 
         CommerciantInput commerciant = findCommerciant(cardDetails.getCommerciant());

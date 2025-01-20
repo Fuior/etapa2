@@ -1,13 +1,4 @@
 Starting audit...
 [ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/CommandProcessor.java:60:13: switch without "default" clause. [MissingSwitchDefault]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/CardServiceManager.java:58:53: '{' is not preceded with whitespace. [WhitespaceAround]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/MoneyPayments.java:238: Line is longer than 100 characters (found 105). [LineLength]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/MoneyPayments.java:238:5: Class 'MoneyPayments' looks like designed for extension (can be subclassed), but the method 'commerciantUpdates' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'MoneyPayments' final or making the method 'commerciantUpdates' static/final/abstract/empty, or adding allowed annotation for the method. [DesignForExtension]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/MoneyPayments.java:238:5: Missing a Javadoc comment. [MissingJavadocMethod]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/CashWithdrawalOperation.java:67: Line is longer than 100 characters (found 102). [LineLength]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/SendMoneyOperation.java:60: Line is longer than 100 characters (found 106). [LineLength]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/SendMoneyOperation.java:78:46: Parameter iban should be final. [FinalParameters]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/SendMoneyOperation.java:121: Line is longer than 100 characters (found 101). [LineLength]
-[ERROR] /home/andreea/Desktop/etapa2/./src/main/java/org/poo/core/transactions/SendMoneyOperation.java:134:79: '{' is not preceded with whitespace. [WhitespaceAround]
 Audit done.
-Checkstyle ends with 10 errors.
+Checkstyle ends with 1 errors.

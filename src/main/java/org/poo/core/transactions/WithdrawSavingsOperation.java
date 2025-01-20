@@ -3,10 +3,10 @@ package org.poo.core.transactions;
 import org.poo.core.BankRepository;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.models.AccountService;
-import org.poo.models.SavingsWithdrawalFormat;
-import org.poo.models.Transaction;
-import org.poo.models.UserDetails;
+import org.poo.models.account.AccountService;
+import org.poo.models.transactions.SavingsWithdrawalFormat;
+import org.poo.models.transactions.Transaction;
+import org.poo.models.user.UserDetails;
 
 import java.time.LocalDate;
 import java.time.Period;

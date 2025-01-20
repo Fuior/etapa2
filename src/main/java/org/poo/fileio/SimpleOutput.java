@@ -1,7 +1,7 @@
 package org.poo.fileio;
 
 import lombok.Getter;
-import org.poo.models.Transaction;
+import org.poo.models.transactions.Transaction;
 
 @Getter
 public class SimpleOutput {

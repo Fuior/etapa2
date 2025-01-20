@@ -1,14 +1,13 @@
 package org.poo.core.transactions;
 
-import org.poo.core.CurrencyExchange;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.models.AccountService;
-import org.poo.models.BusinessAccount;
-import org.poo.models.BusinessAssociate;
-import org.poo.models.CommerciantTransactions;
-import org.poo.models.ServicePlanFormat;
-import org.poo.models.UserDetails;
+import org.poo.models.account.AccountService;
+import org.poo.models.account.BusinessAccount;
+import org.poo.models.account.BusinessAssociate;
+import org.poo.models.transactions.CommerciantTransactions;
+import org.poo.models.user.ServicePlanFormat;
+import org.poo.models.user.UserDetails;
 
 public class MoneyPayments {
 
@@ -235,7 +234,19 @@ public class MoneyPayments {
         }
     }
 
-    public void commerciantUpdates(final CommerciantInput commerciant, final BusinessAssociate associate,
+    /**
+     * Aceasta metoda contorizeaza platile unui user la un
+     * comerciant.
+     *
+     * @param commerciant datele comerciantului
+     * @param associate asociatul contului de business
+     * @param account contul din care s-a facut plata
+     * @param user datele user-ului
+     * @param amount suma platita
+     * @param moneyInRon suma platita in RON
+     */
+    public void commerciantUpdates(final CommerciantInput commerciant,
+                                   final BusinessAssociate associate,
                                    final AccountService account, final UserDetails user,
                                    final double amount, final double moneyInRon) {
 

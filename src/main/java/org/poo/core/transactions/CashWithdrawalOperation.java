@@ -3,12 +3,12 @@ package org.poo.core.transactions;
 import org.poo.core.BankRepository;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.models.AccountService;
-import org.poo.models.BusinessAccount;
-import org.poo.models.CardDetails;
-import org.poo.models.CashWithdrawalFormat;
-import org.poo.models.Transaction;
-import org.poo.models.UserDetails;
+import org.poo.models.account.AccountService;
+import org.poo.models.account.BusinessAccount;
+import org.poo.models.card.CardDetails;
+import org.poo.models.transactions.CashWithdrawalFormat;
+import org.poo.models.transactions.Transaction;
+import org.poo.models.user.UserDetails;
 
 public final class CashWithdrawalOperation extends MoneyPayments implements TransactionOperation {
 
@@ -64,7 +64,8 @@ public final class CashWithdrawalOperation extends MoneyPayments implements Tran
             return "The card is frozen";
         }
 
-        double commission = calculateCommission(user, amount, withdrawalDetails.getAmount(), account);
+        double commission =
+                calculateCommission(user, amount, withdrawalDetails.getAmount(), account);
         double withdrawalMoney = account.getBalance() - amount - commission;
 
         if (account.getMinBalance() != 0.0 && withdrawalMoney < account.getMinBalance()) {

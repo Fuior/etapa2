@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.ObjectInput;
 import org.poo.fileio.UserInput;
-import org.poo.models.UserDetails;
+import org.poo.models.user.UserDetails;
 import org.poo.utils.Utils;
 
 import java.util.ArrayList;

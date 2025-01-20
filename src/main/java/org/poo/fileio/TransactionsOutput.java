@@ -2,8 +2,8 @@ package org.poo.fileio;
 
 import lombok.Getter;
 import org.poo.core.BankRepository;
-import org.poo.models.Transaction;
-import org.poo.models.UserDetails;
+import org.poo.models.transactions.Transaction;
+import org.poo.models.user.UserDetails;
 
 import java.util.ArrayList;
 

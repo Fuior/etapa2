@@ -4,12 +4,12 @@ import org.poo.core.BankRepository;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.models.AccountService;
-import org.poo.models.BusinessAccount;
-import org.poo.models.BusinessAssociate;
-import org.poo.models.MoneyTransfer;
-import org.poo.models.Transaction;
-import org.poo.models.UserDetails;
+import org.poo.models.account.AccountService;
+import org.poo.models.account.BusinessAccount;
+import org.poo.models.account.BusinessAssociate;
+import org.poo.models.transactions.MoneyTransfer;
+import org.poo.models.transactions.Transaction;
+import org.poo.models.user.UserDetails;
 
 import java.text.DecimalFormat;
 
@@ -57,7 +57,8 @@ public final class SendMoneyOperation extends MoneyPayments implements Transacti
             }
         }
 
-        commerciantUpdates(commerciant, associate, sender, user, transferDetails.getAmount(), moneyInRon);
+        commerciantUpdates(commerciant, associate, sender, user,
+                transferDetails.getAmount(), moneyInRon);
         silverToGoldUpgrade(user, moneyInRon, transferDetails.getTimestamp(), sender.getIban());
     }
 
@@ -75,7 +76,7 @@ public final class SendMoneyOperation extends MoneyPayments implements Transacti
         user.getTransactions().add(moneyReceived);
     }
 
-    private CommerciantInput findCommerciant(String iban) {
+    private CommerciantInput findCommerciant(final String iban) {
 
         for (CommerciantInput c : commerciants) {
             if (c.getAccount().equals(iban)) {
@@ -118,7 +119,8 @@ public final class SendMoneyOperation extends MoneyPayments implements Transacti
         double moneyInRon = getAmount("RON", transferDetails.getAmount(),
                 sender.getCurrency(), exchangeRates);
 
-        double commission = calculateCommission(u1, transferDetails.getAmount(), moneyInRon, sender);
+        double commission =
+                calculateCommission(u1, transferDetails.getAmount(), moneyInRon, sender);
 
         if (sender.getBalance() < transferDetails.getAmount() + commission) {
 
@@ -131,7 +133,7 @@ public final class SendMoneyOperation extends MoneyPayments implements Transacti
         if (sender.getAccountType().equals("business")) {
 
             if (((BusinessAccount) sender).isEmployee(u1)
-                    && amount > ((BusinessAccount) sender).getSpendingLimit()){
+                    && amount > ((BusinessAccount) sender).getSpendingLimit()) {
 
                 return null;
             }

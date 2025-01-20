@@ -2,7 +2,7 @@ package org.poo.core.transactions;
 
 import org.poo.core.BankRepository;
 import org.poo.core.BankRepositoryEntity;
-import org.poo.core.CardServiceManager;
+import org.poo.core.service.ServiceHandler;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
@@ -12,19 +12,19 @@ import java.util.List;
 
 public final class TransactionService extends BankRepositoryEntity {
 
-    private final CardServiceManager cardServiceManager;
+    private final ServiceHandler serviceHandler;
     private final ExchangeInput[] exchangeRates;
     private final CommerciantInput[] commerciants;
     private final List<CommandInput> splitPayments;
     private final List<CommandInput> splitPaymentsResponses;
 
     public TransactionService(final BankRepository bankRepository,
-                              final CardServiceManager cardServiceManager,
+                              final ServiceHandler serviceHandler,
                               final ExchangeInput[] exchangeRates,
                               final CommerciantInput[] commerciants) {
 
         super(bankRepository);
-        this.cardServiceManager = cardServiceManager;
+        this.serviceHandler = serviceHandler;
         this.exchangeRates = exchangeRates;
         this.commerciants = commerciants;
         this.splitPayments = new ArrayList<>();
@@ -40,7 +40,7 @@ public final class TransactionService extends BankRepositoryEntity {
     public String executeTransaction(final CommandInput commandInput) {
 
         TransactionOperation operation = TransactionFactory.getOperation(commandInput.getCommand(),
-                bankRepository, cardServiceManager, commerciants,
+                bankRepository, serviceHandler, commerciants,
                 splitPayments, splitPaymentsResponses);
 
         if (operation != null) {

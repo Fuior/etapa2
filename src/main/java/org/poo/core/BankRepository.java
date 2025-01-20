@@ -1,8 +1,8 @@
 package org.poo.core;
 
-import org.poo.models.AccountService;
-import org.poo.models.CardDetails;
-import org.poo.models.UserDetails;
+import org.poo.models.account.AccountService;
+import org.poo.models.card.CardDetails;
+import org.poo.models.user.UserDetails;
 
 import java.util.ArrayList;
 import java.util.HashMap;
