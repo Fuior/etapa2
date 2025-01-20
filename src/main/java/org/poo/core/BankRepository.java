@@ -4,7 +4,9 @@ import org.poo.models.AccountService;
 import org.poo.models.CardDetails;
 import org.poo.models.UserDetails;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BankRepository {
@@ -171,5 +173,22 @@ public class BankRepository {
      */
     public CardDetails findCardByNumber(final String cardNumber) {
         return cardMap.get(cardNumber);
+    }
+
+    /**
+     * Aceasta metoda face o lista cu conturile implicate intr-o plata distribuita.
+     *
+     * @param ibans IBAN-urile conturilor
+     * @return lista de conturi
+     */
+    public ArrayList<AccountService> getAccounts(final List<String> ibans) {
+
+        ArrayList<AccountService> accounts = new ArrayList<>();
+
+        for (String iban : ibans) {
+            accounts.add(findAccountByIBAN(iban));
+        }
+
+        return accounts;
     }
 }

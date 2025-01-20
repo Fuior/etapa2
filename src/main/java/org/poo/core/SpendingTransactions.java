@@ -11,19 +11,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 @Getter
-@Setter
-class Commerciant {
-
-    private final String commerciant;
-    private double total;
-
-    Commerciant(final String commerciant, final double total) {
-        this.commerciant = commerciant;
-        this.total = total;
-    }
-}
-
-@Getter
 public final class SpendingTransactions extends TransactionFormat {
 
     @JsonProperty("commerciants")
@@ -32,6 +19,19 @@ public final class SpendingTransactions extends TransactionFormat {
     public SpendingTransactions(final AccountService account) {
         super(account);
         this.commerciants = new ArrayList<>();
+    }
+
+    @Getter
+    @Setter
+    private static class Commerciant {
+
+        private final String commerciant;
+        private double total;
+
+        Commerciant(final String commerciant, final double total) {
+            this.commerciant = commerciant;
+            this.total = total;
+        }
     }
 
     @Override

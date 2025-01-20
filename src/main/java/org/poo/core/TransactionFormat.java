@@ -1,26 +1,19 @@
 package org.poo.core;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
 import org.poo.models.AccountService;
 import org.poo.models.Transaction;
 
 import java.util.ArrayList;
 
-@Data
-public class TransactionFormat {
+@Getter
+public class TransactionFormat extends ReportFormat {
 
-    @JsonProperty("IBAN")
-    private String iban;
-    private double balance;
-    private String currency;
     protected ArrayList<Transaction> transactions;
 
     public TransactionFormat(final AccountService account) {
 
-        this.iban = account.getIban();
-        this.balance = account.getBalance();
-        this.currency = account.getCurrency();
+        super(account);
         this.transactions = new ArrayList<>();
     }
 

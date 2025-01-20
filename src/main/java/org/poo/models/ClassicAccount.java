@@ -2,6 +2,7 @@ package org.poo.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.fileio.CommandInput;
 
 import java.util.ArrayList;
 
@@ -11,10 +12,9 @@ public class ClassicAccount extends  AccountService {
 
     private ArrayList<CardPaymentFormat> cardPayments;
 
-    public ClassicAccount(final String currency, final String accountType,
-                          final int timestamp) {
+    public ClassicAccount(final CommandInput accountDetails) {
 
-        super(currency, accountType, timestamp);
+        super(accountDetails);
         this.cardPayments = new ArrayList<>();
     }
 }

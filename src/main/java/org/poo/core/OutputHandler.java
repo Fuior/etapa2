@@ -3,11 +3,9 @@ package org.poo.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.fileio.CommandInput;
-import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.DeleteAccountOutput;
-import org.poo.fileio.ExchangeInput;
-import org.poo.fileio.OutputGenerator;
 import org.poo.fileio.ErrorOutput;
+import org.poo.fileio.OutputGenerator;
 import org.poo.fileio.SimpleOutput;
 import org.poo.fileio.SpendingsErrorOutput;
 import org.poo.fileio.TransactionsOutput;
@@ -64,15 +62,39 @@ public class OutputHandler {
 
     /**
      * Aceasta metoda genereaza "outputul" unei plati cu cardul.
-     *
-     * @param exchangeRates cursurile de schimb valutar
      */
-    public void payOnline(final ExchangeInput[] exchangeRates,
-                          final CommerciantInput[] commerciants) {
+    public void payOnline() {
 
-        ErrorOutput myOutput = bank.payOnline(commandInput, exchangeRates, commerciants);
+        String message = bank.payOnline(commandInput);
 
-        if (myOutput != null) {
+        if (message != null) {
+            ErrorOutput myOutput = new ErrorOutput(commandInput, message);
+            output.add(objectMapper.valueToTree(myOutput));
+        }
+    }
+
+    /**
+     * Aceasta metoda genereaza "outputul" unui transfer bancar.
+     */
+    public void sendMoney() {
+
+        String message = bank.sendMoney(commandInput);
+
+        if (message != null) {
+            SimpleOutput myOutput = new SimpleOutput(commandInput, message);
+            output.add(objectMapper.valueToTree(myOutput));
+        }
+    }
+
+    /**
+     * Aceasta metoda genereaza "outputul" unei plati distribuite.
+     */
+    public void splitPaymentOutput() {
+
+        String message = bank.splitPaymentResponse(commandInput);
+
+        if (message != null) {
+            SimpleOutput myOutput = new SimpleOutput(commandInput, message);
             output.add(objectMapper.valueToTree(myOutput));
         }
     }
@@ -126,18 +148,30 @@ public class OutputHandler {
     }
 
     /**
+     * Aceasta metoda genereaza "outputul" unui operatii
+     * de schimbare a limitei de cheltuieli/depuneri de bani.
+     */
+    public void changeMoneyLimit() {
+
+        String message = bank.changeMoneyLimit(commandInput);
+
+        if (message != null) {
+            SimpleOutput myOutput = new SimpleOutput(commandInput, message);
+            output.add(objectMapper.valueToTree(myOutput));
+        }
+    }
+
+    /**
      * Aceasta metoda genereaza un raport pentru un cont
      * si "outputul" care se fa afisa in fisierul de iesire.
-     *
-     * @param reportDetails detaliile actiunii
      */
-    public void getReport(final CommandInput reportDetails) {
+    public void getReport() {
 
         Report report = bank.generateReport(commandInput);
 
         if (report == null) {
 
-            ErrorOutput myOutput = new ErrorOutput(reportDetails,
+            ErrorOutput myOutput = new ErrorOutput(commandInput,
                     "Account not found");
 
             output.add(objectMapper.valueToTree(myOutput));
@@ -151,17 +185,15 @@ public class OutputHandler {
 
     /**
      * Aceasta metoda genereaza un raport de cheltuieli pentru un cont
-     * si "outputul" care se fa afisa in fisierul de iesire.
-     *
-     * @param reportDetails detaliile actiunii
+     * si "outputul" care se va afisa in fisierul de iesire.
      */
-    public void getSpendingReport(final CommandInput reportDetails) {
+    public void getSpendingReport() {
 
         Report report = bank.generateReport(commandInput);
 
         if (report == null) {
 
-            ErrorOutput myOutput = new ErrorOutput(reportDetails,
+            ErrorOutput myOutput = new ErrorOutput(commandInput,
                     "Account not found");
 
             output.add(objectMapper.valueToTree(myOutput));
@@ -177,22 +209,40 @@ public class OutputHandler {
     }
 
     /**
+     * Aceasta metoda genereaza un raport de cheltuieli pentru un cont de business
+     * si "outputul" care se va afisa in fisierul de iesire.
+     */
+    public void getBusinessReport() {
+
+        Report report = bank.generateReport(commandInput);
+
+        if (report == null) {
+
+            ErrorOutput myOutput = new ErrorOutput(commandInput,
+                    "Account not found");
+
+            output.add(objectMapper.valueToTree(myOutput));
+            return;
+        }
+
+        if (report.getOutput() != null) {
+            output.add(objectMapper.valueToTree(report));
+        }
+    }
+
+    /**
      * Aceasta metoda genereaza mesajul de eroare pentru
      * o retragere de numerar esuata.
-     *
-     * @param withdrawalDetails datele necesare retragerii
-     * @param exchangeRates cursurile de schimb valutar
      */
-    public void cashWithdrawal(final CommandInput withdrawalDetails,
-                               final ExchangeInput[] exchangeRates) {
+    public void cashWithdrawal() {
 
-        String message = bank.cashWithdrawal(withdrawalDetails, exchangeRates);
+        String message = bank.cashWithdrawal(commandInput);
 
         if (message == null) {
             return;
         }
 
-        SimpleOutput myOutput = new SimpleOutput(withdrawalDetails, message);
+        SimpleOutput myOutput = new SimpleOutput(commandInput, message);
         output.add(objectMapper.valueToTree(myOutput));
     }
 }

@@ -2,6 +2,7 @@ package org.poo.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 import org.poo.utils.Utils;
 
@@ -21,20 +22,21 @@ public abstract class AccountService {
     protected ArrayList<CommerciantTransactions> foodTransactions;
     protected ArrayList<CommerciantTransactions> clothesTransactions;
     protected ArrayList<CommerciantTransactions> techTransactions;
+    protected double totalSpentByMerchants;
 
-    public AccountService(final String currency, final String accountType,
-                          final int timestamp) {
+    public AccountService(final CommandInput accountDetails) {
 
         this.iban = Utils.generateIBAN();
         this.balance = 0;
         this.minBalance = 0;
-        this.currency = currency;
-        this.accountType = accountType;
-        this.timestamp = timestamp;
+        this.currency = accountDetails.getCurrency();
+        this.accountType = accountDetails.getAccountType();
+        this.timestamp = accountDetails.getTimestamp();
         this.cards = new ArrayList<>();
         this.foodTransactions = new ArrayList<>();
         this.clothesTransactions = new ArrayList<>();
         this.techTransactions = new ArrayList<>();
+        this.totalSpentByMerchants = 0;
     }
 
     /**

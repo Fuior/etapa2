@@ -2094,6 +2094,20 @@
   } ],
   "timestamp" : 777
 }, {
+  "command" : "changeDepositLimit",
+  "output" : {
+    "timestamp" : 794,
+    "description" : "You must be owner in order to change deposit limit."
+  },
+  "timestamp" : 794
+}, {
+  "command" : "changeSpendingLimit",
+  "output" : {
+    "timestamp" : 795,
+    "description" : "You must be owner in order to change spending limit."
+  },
+  "timestamp" : 795
+}, {
   "command" : "payOnline",
   "output" : {
     "description" : "Card not found",
@@ -2107,13 +2121,6 @@
     "timestamp" : 801
   },
   "timestamp" : 801
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 802,
-    "description" : "User not found"
-  },
-  "timestamp" : 802
 }, {
   "command" : "payOnline",
   "output" : {
@@ -2129,13 +2136,6 @@
   },
   "timestamp" : 805
 }, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 806,
-    "description" : "User not found"
-  },
-  "timestamp" : 806
-}, {
   "command" : "payOnline",
   "output" : {
     "description" : "Card not found",
@@ -2149,13 +2149,6 @@
     "timestamp" : 809
   },
   "timestamp" : 809
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 810,
-    "description" : "User not found"
-  },
-  "timestamp" : 810
 }, {
   "command" : "payOnline",
   "output" : {
@@ -2171,13 +2164,6 @@
   },
   "timestamp" : 813
 }, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 814,
-    "description" : "User not found"
-  },
-  "timestamp" : 814
-}, {
   "command" : "payOnline",
   "output" : {
     "description" : "Card not found",
@@ -2191,13 +2177,6 @@
     "timestamp" : 817
   },
   "timestamp" : 817
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 818,
-    "description" : "User not found"
-  },
-  "timestamp" : 818
 }, {
   "command" : "payOnline",
   "output" : {
@@ -2213,13 +2192,6 @@
   },
   "timestamp" : 821
 }, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 822,
-    "description" : "User not found"
-  },
-  "timestamp" : 822
-}, {
   "command" : "payOnline",
   "output" : {
     "description" : "Card not found",
@@ -2233,13 +2205,6 @@
     "timestamp" : 825
   },
   "timestamp" : 825
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 826,
-    "description" : "User not found"
-  },
-  "timestamp" : 826
 }, {
   "command" : "payOnline",
   "output" : {
@@ -2255,13 +2220,6 @@
   },
   "timestamp" : 829
 }, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 830,
-    "description" : "User not found"
-  },
-  "timestamp" : 830
-}, {
   "command" : "payOnline",
   "output" : {
     "description" : "Card not found",
@@ -2275,13 +2233,6 @@
     "timestamp" : 833
   },
   "timestamp" : 833
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 834,
-    "description" : "User not found"
-  },
-  "timestamp" : 834
 }, {
   "command" : "payOnline",
   "output" : {
@@ -2297,12 +2248,84 @@
   },
   "timestamp" : 837
 }, {
-  "command" : "sendMoney",
+  "command" : "businessReport",
   "output" : {
-    "timestamp" : 838,
-    "description" : "User not found"
+    "balance" : 4711.0,
+    "currency" : "CHF",
+    "managers" : [ {
+      "username" : "Arana Trillo Mamen",
+      "spent" : 0.0,
+      "deposited" : 3337.0
+    }, {
+      "username" : "Sheppard Heather",
+      "spent" : 0.0,
+      "deposited" : 923.0
+    }, {
+      "username" : "du Mendes Thibault",
+      "spent" : 0.0,
+      "deposited" : 451.0
+    } ],
+    "employees" : [ {
+      "username" : "Manuel Baez Anaya Victor",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Charette Gregoire",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Barer-Gehringer Juan",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Camiscione-Rugger Emilio",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "del Ripoll Nicodemo",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Farrell Heather",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Kaiser Hulda",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Stone Elizabeth",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Villa Dorothy",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    }, {
+      "username" : "Carey Frank",
+      "spent" : 0.0,
+      "deposited" : 0.0
+    } ],
+    "IBAN" : "RO73POOB7862625166958832",
+    "spending limit" : 122.22222222222224,
+    "deposit limit" : 211.0,
+    "statistics type" : "transaction",
+    "total spent" : 0.0,
+    "total deposited" : 4711.0
   },
-  "timestamp" : 838
+  "timestamp" : 839
+}, {
+  "command" : "businessReport",
+  "output" : {
+    "balance" : 4711.0,
+    "currency" : "CHF",
+    "commerciants" : [ ],
+    "IBAN" : "RO73POOB7862625166958832",
+    "spending limit" : 122.22222222222224,
+    "deposit limit" : 211.0,
+    "statistics type" : "commerciant"
+  },
+  "timestamp" : 840
 }, {
   "command" : "spendingsReport",
   "output" : {
@@ -2365,27 +2388,6 @@
   },
   "timestamp" : 854
 }, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 856,
-    "description" : "User not found"
-  },
-  "timestamp" : 856
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 857,
-    "description" : "User not found"
-  },
-  "timestamp" : 857
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 859,
-    "description" : "User not found"
-  },
-  "timestamp" : 859
-}, {
   "command" : "cashWithdrawal",
   "output" : {
     "timestamp" : 860,
@@ -2399,13 +2401,6 @@
     "timestamp" : 861
   },
   "timestamp" : 861
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 862,
-    "description" : "User not found"
-  },
-  "timestamp" : 862
 }, {
   "command" : "cashWithdrawal",
   "output" : {
@@ -2442,13 +2437,6 @@
   },
   "timestamp" : 871
 }, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 873,
-    "description" : "User not found"
-  },
-  "timestamp" : 873
-}, {
   "command" : "cashWithdrawal",
   "output" : {
     "timestamp" : 874,
@@ -2462,13 +2450,6 @@
     "timestamp" : 876
   },
   "timestamp" : 876
-}, {
-  "command" : "sendMoney",
-  "output" : {
-    "timestamp" : 877,
-    "description" : "User not found"
-  },
-  "timestamp" : 877
 }, {
   "command" : "cashWithdrawal",
   "output" : {
@@ -2484,7 +2465,7 @@
     "email" : "Jennifer_Gould@mail.com.ca",
     "accounts" : [ {
       "IBAN" : "RO58POOB7344468893732422",
-      "balance" : 6242.981428571428,
+      "balance" : 3294.3814285714284,
       "currency" : "CAD",
       "type" : "classic",
       "cards" : [ {
@@ -3029,7 +3010,7 @@
     "email" : "Thibault_du_Mendes@zoho.fr",
     "accounts" : [ {
       "IBAN" : "RO01POOB9893132718323396",
-      "balance" : 1403.0,
+      "balance" : 120.94199999999988,
       "currency" : "EUR",
       "type" : "savings",
       "cards" : [ {
@@ -3042,7 +3023,7 @@
 }, {
   "command" : "spendingsReport",
   "output" : {
-    "balance" : 6242.981428571428,
+    "balance" : 3294.3814285714284,
     "currency" : "CAD",
     "transactions" : [ {
       "timestamp" : 620,

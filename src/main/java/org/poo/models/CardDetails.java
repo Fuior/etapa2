@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class CardDetails {
 
+    private UserDetails cardHolder;
     private String cardNumber;
     private String type;
     private int timestamp;

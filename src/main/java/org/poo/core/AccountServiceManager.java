@@ -1,9 +1,14 @@
 package org.poo.core;
 
 import lombok.Getter;
+import org.poo.core.transactions.MoneyPayments;
+import org.poo.core.transactions.TransactionService;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
+import org.poo.fileio.ExchangeInput;
 import org.poo.models.AccountService;
+import org.poo.models.BusinessAccount;
+import org.poo.models.BusinessAssociate;
 import org.poo.models.ClassicAccount;
 import org.poo.models.InterestFormat;
 import org.poo.models.SavingsAccount;
@@ -14,11 +19,19 @@ import org.poo.models.UserDetails;
 public final class AccountServiceManager extends BankRepositoryEntity implements ResourceManager {
 
     private String error;
+    private final TransactionService transactionService;
+    private final ExchangeInput[] exchangeRates;
+    private final MoneyPayments moneyPayments;
 
-    public AccountServiceManager(final BankRepository bankRepository) {
+    public AccountServiceManager(final BankRepository bankRepository,
+                                 final TransactionService transactionService,
+                                 final ExchangeInput[] exchangeRates) {
 
         super(bankRepository);
-        error = null;
+        this.error = null;
+        this.transactionService = transactionService;
+        this.exchangeRates = exchangeRates;
+        this.moneyPayments = new MoneyPayments();
     }
 
     @Override
@@ -28,20 +41,30 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
         AccountService bankAccount;
 
         if (accountDetails.getAccountType().equals("savings")) {
-            bankAccount = new SavingsAccount(accountDetails.getCurrency(),
-                    accountDetails.getAccountType(), accountDetails.getTimestamp());
-
+            bankAccount = new SavingsAccount(accountDetails);
             ((SavingsAccount) bankAccount).setInterestRate(accountDetails.getInterestRate());
+        } else if (accountDetails.getAccountType().equals("classic")) {
+            bankAccount = new ClassicAccount(accountDetails);
         } else {
-            bankAccount = new ClassicAccount(accountDetails.getCurrency(),
-                    accountDetails.getAccountType(), accountDetails.getTimestamp());
+            bankAccount = new BusinessAccount(accountDetails);
+            ((BusinessAccount) bankAccount).setOwner(user);
+
+            final double limitInRon = 500;
+            double initialLimit = moneyPayments.getAmount(bankAccount.getCurrency(),
+                    limitInRon, "RON", exchangeRates);
+
+            ((BusinessAccount) bankAccount).setSpendingLimit(initialLimit);
+            ((BusinessAccount) bankAccount).setDepositLimit(initialLimit);
         }
 
         bankAccount.setCommerciantTransactions(commerciants);
 
         user.getBankAccounts().add(bankAccount);
-        user.getTransactions().add(new Transaction(accountDetails.getTimestamp(),
-                "New account created"));
+
+        if (!bankAccount.getAccountType().equals("business")) {
+            user.getTransactions().add(new Transaction(accountDetails.getTimestamp(),
+                    "New account created"));
+        }
 
         bankRepository.addAccount(bankAccount);
         bankRepository.addUserByAccount(user, bankAccount.getIban());
@@ -59,6 +82,12 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
         }
 
         UserDetails user = bankRepository.findUserByAccount(bankAccount);
+
+        if (bankAccount.getAccountType().equals("business")
+                && ((BusinessAccount) bankAccount).getOwner() != user) {
+
+            return;
+        }
 
         if (bankAccount.getBalance() != 0.0) {
 
@@ -86,6 +115,35 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
     }
 
     /**
+     * Aceasta metoda adauga un asociat la un cont de business
+     *
+     * @param associateDetails datele asociatului
+     */
+    public void addNewBusinessAssociate(final CommandInput associateDetails) {
+
+        UserDetails user = bankRepository.findUser(associateDetails.getEmail());
+
+        if (user == null) {
+            return;
+        }
+
+        BusinessAccount account =
+                (BusinessAccount) bankRepository.findAccountByIBAN(associateDetails.getAccount());
+
+        if (account.findAssociate(user.getUserInput().getEmail()) != null
+                || account.getOwner() == user) {
+
+            return;
+        }
+
+        if (associateDetails.getRole().equals("manager")) {
+            account.getManagers().add(new BusinessAssociate(user.getUserInput()));
+        } else {
+            account.getEmployees().add(new BusinessAssociate(user.getUserInput()));
+        }
+    }
+
+    /**
      * Aceasta metoda adauga fonduri intr-un cont
      *
      * @param fundsDetails datele contului si valoare fondurilor
@@ -94,9 +152,33 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
 
         AccountService account = bankRepository.findAccountByIBAN(fundsDetails.getAccount());
 
-        if (account != null) {
-            account.setBalance(account.getBalance() + fundsDetails.getAmount());
+        if (account == null) {
+            return;
         }
+
+        if (account.getAccountType().equals("business")) {
+
+            BusinessAccount businessAccount = (BusinessAccount) account;
+            BusinessAssociate associate = businessAccount.findAssociate(fundsDetails.getEmail());
+
+            if (associate != null) {
+
+                if (businessAccount.isEmployee(associate)
+                        && fundsDetails.getAmount() > businessAccount.getDepositLimit()) {
+
+                    return;
+                }
+
+                associate.setMoneyDeposited(associate.getMoneyDeposited()
+                        + fundsDetails.getAmount());
+            } else if (!businessAccount.getOwner().getUserInput()
+                    .getEmail().equals(fundsDetails.getEmail())) {
+
+                return;
+            }
+        }
+
+        account.setBalance(account.getBalance() + fundsDetails.getAmount());
     }
 
     /**
@@ -183,5 +265,40 @@ public final class AccountServiceManager extends BankRepositoryEntity implements
         user.getTransactions().add(new Transaction(interestDetails.getTimestamp(), description));
 
         return 0;
+    }
+
+    /**
+     * Aceasta metoda schimba limita de cheltuieli sau de depus bani
+     * pentru un cont de business.
+     *
+     * @param limitDetails datele necesare operatiei
+     * @return mesajul de eroare al operatiei
+     */
+    public String changeMoneyLimit(final CommandInput limitDetails) {
+
+        AccountService accountService = bankRepository.findAccountByIBAN(limitDetails.getAccount());
+
+        if (!accountService.getAccountType().equals("business")) {
+            return "This is not a business account";
+        }
+
+        BusinessAccount account = (BusinessAccount) accountService;
+
+        if (!account.getOwner().getUserInput().getEmail().equals(limitDetails.getEmail())) {
+
+            if (limitDetails.getCommand().equals("changeSpendingLimit")) {
+                return "You must be owner in order to change spending limit.";
+            } else {
+                return "You must be owner in order to change deposit limit.";
+            }
+        }
+
+        if (limitDetails.getCommand().equals("changeSpendingLimit")) {
+            account.setSpendingLimit(limitDetails.getAmount());
+        } else {
+            account.setDepositLimit(limitDetails.getAmount());
+        }
+
+        return null;
     }
 }

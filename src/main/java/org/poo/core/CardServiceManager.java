@@ -3,6 +3,7 @@ package org.poo.core;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 import org.poo.models.AccountService;
+import org.poo.models.BusinessAccount;
 import org.poo.models.CardActionsFormat;
 import org.poo.models.CardDetails;
 import org.poo.models.UserDetails;
@@ -29,6 +30,7 @@ public final class CardServiceManager extends BankRepositoryEntity implements Re
                 .equals("createCard") ? "basic card" : "one time card";
 
         account.getCards().add(new CardDetails(cardNumber, type, cardDetails.getTimestamp()));
+        account.getCards().getLast().setCardHolder(user);
 
         bankRepository.addCard(account.getCards().getLast());
         bankRepository.addAccountByCard(account, account.getCards().getLast());
@@ -49,6 +51,19 @@ public final class CardServiceManager extends BankRepositoryEntity implements Re
 
         AccountService account = bankRepository.findAccountByCard(cardDetails.getCardNumber());
         UserDetails user = bankRepository.findUserByAccount(account);
+
+        if (account.getAccountType().equals("business")) {
+
+            if (((BusinessAccount) account).isEmployee(user)
+                    && card.getCardHolder() != user){
+
+                return;
+            }
+        }
+
+        if (account.getBalance() != 0) {
+            return;
+        }
 
         user.getTransactions().add(new CardActionsFormat(cardDetails.getTimestamp(),
                 "The card has been destroyed", card.getCardNumber(),

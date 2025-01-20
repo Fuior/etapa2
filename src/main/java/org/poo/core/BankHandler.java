@@ -2,10 +2,10 @@ package org.poo.core;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Data;
+import org.poo.core.transactions.TransactionService;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
-import org.poo.fileio.ErrorOutput;
 import org.poo.models.UserDetails;
 
 import java.util.ArrayList;
@@ -21,15 +21,18 @@ public final class BankHandler implements IBankHandler {
     private ReportingService reportingService;
     private ServicePlanManager servicePlanManager;
 
-    public BankHandler(final ArrayList<UserDetails> users, final BankRepository bankRepository) {
+    public BankHandler(final ArrayList<UserDetails> users, final BankRepository bankRepository,
+                       final ExchangeInput[] exchangeRates, final CommerciantInput[] commerciants) {
 
         this.users = users;
         this.bankRepository = bankRepository;
-        this.accountServiceManager = new AccountServiceManager(bankRepository);
         this.cardServiceManager = new CardServiceManager(bankRepository);
-        this.transactionService = new TransactionService(bankRepository, cardServiceManager);
+        this.transactionService = new TransactionService(bankRepository,
+                cardServiceManager, exchangeRates, commerciants);
+        this.accountServiceManager = new AccountServiceManager(bankRepository,
+                transactionService, exchangeRates);
         this.reportingService = new ReportingService(bankRepository);
-        this.servicePlanManager = new ServicePlanManager(bankRepository, transactionService);
+        this.servicePlanManager = new ServicePlanManager(bankRepository);
     }
 
     @Override
@@ -43,6 +46,11 @@ public final class BankHandler implements IBankHandler {
     public String deleteAccount(final CommandInput accountDetails) {
         accountServiceManager.delete(accountDetails);
         return accountServiceManager.getError();
+    }
+
+    @Override
+    public void addNewBusinessAssociate(final CommandInput associateDetails) {
+        accountServiceManager.addNewBusinessAssociate(associateDetails);
     }
 
     @Override
@@ -71,6 +79,11 @@ public final class BankHandler implements IBankHandler {
     }
 
     @Override
+    public String changeMoneyLimit(final CommandInput limitDetails) {
+        return accountServiceManager.changeMoneyLimit(limitDetails);
+    }
+
+    @Override
     public void addCard(final CommandInput cardDetails, final CommerciantInput[] commerciants) {
         cardServiceManager.add(cardDetails, commerciants);
     }
@@ -81,30 +94,23 @@ public final class BankHandler implements IBankHandler {
     }
 
     @Override
-    public ErrorOutput payOnline(final CommandInput cardDetails,
-                                 final ExchangeInput[] exchangeRates,
-                                 final CommerciantInput[] commerciants) {
-
-        return transactionService.payOnline(cardDetails, exchangeRates, commerciants);
+    public String payOnline(final CommandInput cardDetails) {
+        return transactionService.executeTransaction(cardDetails);
     }
 
     @Override
-    public void sendMoney(final CommandInput transferDetails, final ArrayNode output,
-                          final ExchangeInput[] exchangeRates) {
-
-        transactionService.sendMoney(transferDetails, exchangeRates, output);
+    public String sendMoney(final CommandInput transferDetails) {
+        return transactionService.executeTransaction(transferDetails);
     }
 
     @Override
     public void splitPayment(final CommandInput paymentDetails) {
-        transactionService.splitPayment(paymentDetails);
+        transactionService.executeTransaction(paymentDetails);
     }
 
     @Override
-    public void splitPaymentResponse(final ArrayNode output, final CommandInput response,
-                                     final ExchangeInput[] exchangeRates) {
-
-        transactionService.splitPaymentResponse(output, response, exchangeRates);
+    public String splitPaymentResponse(final CommandInput response) {
+        return transactionService.executeTransaction(response);
     }
 
     @Override
@@ -113,10 +119,8 @@ public final class BankHandler implements IBankHandler {
     }
 
     @Override
-    public void withdrawSavings(final CommandInput withdrawalDetails,
-                                final ExchangeInput[] exchangeRates) {
-
-        transactionService.withdrawSavings(withdrawalDetails, exchangeRates);
+    public void withdrawSavings(final CommandInput withdrawalDetails) {
+        transactionService.executeTransaction(withdrawalDetails);
     }
 
     @Override
@@ -129,9 +133,7 @@ public final class BankHandler implements IBankHandler {
     }
 
     @Override
-    public String cashWithdrawal(final CommandInput withdrawalDetails,
-                               final ExchangeInput[] exchangeRates) {
-
-        return transactionService.cashWithdrawal(withdrawalDetails, exchangeRates);
+    public String cashWithdrawal(final CommandInput withdrawalDetails) {
+        return transactionService.executeTransaction(withdrawalDetails);
     }
 }

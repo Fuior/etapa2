@@ -48,10 +48,12 @@ public final class CommandProcessor {
         ArrayList<UserDetails> users = getUsers(inputData.getUsers());
         BankRepository bankRepository = getBankRepository(users);
 
-        BankHandler bank = new BankHandler(users, bankRepository);
+        BankHandler bank = new BankHandler(users, bankRepository,
+                inputData.getExchangeRates(), inputData.getCommerciants());
         Utils.resetRandom();
 
         for (CommandInput commandInput : inputData.getCommands()) {
+
             OutputHandler outputHandler;
             outputHandler = new OutputHandler(commandInput, bank, objectMapper, output);
 
@@ -63,17 +65,17 @@ public final class CommandProcessor {
                 case "createCard", "createOneTimeCard" -> bank.addCard(commandInput,
                         inputData.getCommerciants());
 
+                case "addNewBusinessAssociate" -> bank.addNewBusinessAssociate(commandInput);
+
                 case "addFunds" -> bank.addFunds(commandInput);
 
                 case "deleteAccount" -> outputHandler.deleteAccount();
 
                 case "deleteCard" -> bank.deleteCard(commandInput);
 
-                case "payOnline" -> outputHandler.payOnline(inputData.getExchangeRates(),
-                        inputData.getCommerciants());
+                case "payOnline" -> outputHandler.payOnline();
 
-                case "sendMoney" -> bank.sendMoney(commandInput, output,
-                        inputData.getExchangeRates());
+                case "sendMoney" -> outputHandler.sendMoney();
 
                 case "setAlias" -> bank.setAlias(commandInput);
 
@@ -86,23 +88,25 @@ public final class CommandProcessor {
                 case "splitPayment" -> bank.splitPayment(commandInput);
 
                 case "acceptSplitPayment", "rejectSplitPayment" ->
-                        bank.splitPaymentResponse(output, commandInput,
-                        inputData.getExchangeRates());
+                        outputHandler.splitPaymentOutput();
 
                 case "addInterest", "changeInterestRate" -> outputHandler.interestRate();
 
-                case "report" -> outputHandler.getReport(commandInput);
+                case "changeSpendingLimit", "changeDepositLimit" ->
+                        outputHandler.changeMoneyLimit();
 
-                case "spendingsReport" -> outputHandler.getSpendingReport(commandInput);
+                case "report" -> outputHandler.getReport();
 
-                case "withdrawSavings" ->
-                        bank.withdrawSavings(commandInput, inputData.getExchangeRates());
+                case "spendingsReport" -> outputHandler.getSpendingReport();
+
+                case "businessReport" -> outputHandler.getBusinessReport();
+
+                case "withdrawSavings" -> bank.withdrawSavings(commandInput);
 
                 case "upgradePlan" ->
                         bank.upgradePlan(commandInput, inputData.getExchangeRates(), output);
 
-                case "cashWithdrawal" ->
-                        outputHandler.cashWithdrawal(commandInput, inputData.getExchangeRates());
+                case "cashWithdrawal" -> outputHandler.cashWithdrawal();
             }
         }
     }

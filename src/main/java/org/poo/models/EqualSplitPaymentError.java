@@ -11,12 +11,12 @@ public class EqualSplitPaymentError extends SplitPaymentError {
     private final List<String> involvedAccounts;
     private final String error;
 
-    public EqualSplitPaymentError(final String description, final String iban,
+    public EqualSplitPaymentError(final String description, final String error,
                                   final EqualSplitPayment paymentInput) {
 
         super(description, paymentInput);
         this.amount = paymentInput.getAmount();
         this.involvedAccounts = paymentInput.getInvolvedAccounts();
-        this.error = "Account " + iban + " has insufficient funds for a split payment.";
+        this.error = error;
     }
 }

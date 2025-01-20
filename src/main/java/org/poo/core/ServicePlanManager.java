@@ -2,6 +2,7 @@ package org.poo.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.poo.core.transactions.MoneyPayments;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.ExchangeInput;
 import org.poo.fileio.SimpleOutput;
@@ -12,19 +13,18 @@ import org.poo.models.UserDetails;
 
 public final class ServicePlanManager extends BankRepositoryEntity {
 
-    private final TransactionService transactionService;
+    private final MoneyPayments moneyPayments;
 
-    public ServicePlanManager(final BankRepository bankRepository,
-                              final TransactionService transactionService) {
+    public ServicePlanManager(final BankRepository bankRepository) {
 
         super(bankRepository);
-        this.transactionService = transactionService;
+        this.moneyPayments = new MoneyPayments();
     }
 
     private String payFee(final AccountService account, final double fee,
-                          final ExchangeInput[] exchangeRates) {
+                         final ExchangeInput[] exchangeRates) {
 
-        double amount = transactionService.getAmount(account.getCurrency(),
+        double amount = moneyPayments.getAmount(account.getCurrency(),
                 fee, "RON", exchangeRates);
 
         if (account.getBalance() < amount) {
@@ -64,31 +64,38 @@ public final class ServicePlanManager extends BankRepositoryEntity {
 
             user.getTransactions().add(new Transaction(accountDetails.getTimestamp(),
                     "The user already has the " + newPlanType + " plan."));
+
+            return;
         } else if (userPlan.equals("gold")
                 || (userPlan.equals("silver") && !newPlanType.equals("gold"))) {
 
             user.getTransactions().add(new Transaction(accountDetails.getTimestamp(),
                     "You cannot downgrade your plan."));
+
+            return;
+        } else if ((userPlan.equals("standard") && newPlanType.equals("student"))
+                || (userPlan.equals("student") && newPlanType.equals("standard"))) {
+
+            return;
+        }
+
+        final double standardToSilverFee = 100;
+        final double silverToGoldFee = 250;
+        final double standardToGoldFee = 350;
+
+        double fee = userPlan.equals("silver")
+                ? silverToGoldFee : (newPlanType.equals("silver")
+                ? standardToSilverFee : standardToGoldFee);
+
+        String message = payFee(account, fee, exchangeRates);
+
+        if (message.equals("Upgrade plan")) {
+            user.setServicePlan(newPlanType);
+
+            user.getTransactions().add(new ServicePlanFormat(accountDetails.getTimestamp(),
+                    message, accountDetails.getAccount(), accountDetails.getNewPlanType()));
         } else {
-
-            final double standardToSilverFee = 100;
-            final double silverToGoldFee = 250;
-            final double standardToGoldFee = 350;
-
-            double fee = userPlan.equals("silver")
-                    ? silverToGoldFee : (newPlanType.equals("silver")
-                    ? standardToSilverFee : standardToGoldFee);
-
-            String message = payFee(account, fee, exchangeRates);
-
-            if (message.equals("Upgrade plan")) {
-                user.setServicePlan(newPlanType);
-
-                user.getTransactions().add(new ServicePlanFormat(accountDetails.getTimestamp(),
-                        message, accountDetails.getAccount(), accountDetails.getNewPlanType()));
-            } else {
-                user.getTransactions().add(new Transaction(accountDetails.getTimestamp(), message));
-            }
+            user.getTransactions().add(new Transaction(accountDetails.getTimestamp(), message));
         }
     }
 }
